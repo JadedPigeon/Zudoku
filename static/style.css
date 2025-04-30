@@ -1,0 +1,31 @@
+#sudoku-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 40px);
+    grid-template-rows: repeat(9, 40px);
+    border: 3px solid #000;
+    width: fit-content;
+    margin: 20px auto;
+}
+
+.cell {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    outline: none;
+}
+
+/* Bold RIGHT border for columns 3 and 6 (0-based indexes: 2 and 5) */
+.cell:nth-child(9n+3),
+.cell:nth-child(9n+6) {
+    border-right: 3px solid #000;
+}
+
+/* Bold BOTTOM border for rows 3 and 6 */
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54) {
+    border-bottom: 3px solid #000;
+}
