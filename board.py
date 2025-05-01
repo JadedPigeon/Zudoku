@@ -58,13 +58,13 @@ class Board:
 
         
 
-if __name__ == "__main__":
-    # Testing
-    gui = Tk()
-    gui.configure(background="#D3D3D3")
-    gui.title("Zudoku test")
-    gui.geometry("1200x1200")
-    gui.resizable(True, True)
-    app = Board(gui)
-    # Start the GUI event loop
-    gui.mainloop()
+# if __name__ == "__main__":
+#     # Testing
+#     gui = Tk()
+#     gui.configure(background="#D3D3D3")
+#     gui.title("Zudoku test")
+#     gui.geometry("1200x1200")
+#     gui.resizable(True, True)
+#     app = Board(gui)
+#     # Start the GUI event loop
+#     gui.mainloop()
