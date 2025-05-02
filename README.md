@@ -5,6 +5,4 @@ A Sudoku game made in Python using TKinter
 1. Created the Sudoku Board
 
 # To Do
-- Format cells if they are a hint
-- Style and format board
-- Restrict Entries to 1-9
+- Redo the board so that it's button based instead of entry based
