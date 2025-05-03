@@ -6,3 +6,4 @@ A Sudoku game made in Python using TKinter
 
 # To Do
 - Redo the board so that it's button based instead of entry based
+- Start buttons first
