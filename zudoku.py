@@ -3,7 +3,7 @@ from tkinter import *
 current_number = 1
 
 # note = 0 # answer = 1
-note_or_answer = 1
+action_type = 1
 
 def number_button_clicked(number, button):
     global current_number
@@ -15,15 +15,17 @@ def number_button_clicked(number, button):
 
 def cell_button_clicked(button):
     global current_number
-    if note_or_answer == 1:
+    if action_type == 1:
         button.config(text=str(current_number))
+    elif action_type == 2:
+        button.config(text="")
     else:
         print("not implemented yet")
 
 def note_answer_changed(btn):
-    global note_or_answer
-    note_or_answer = btn.cget("value")
-    print(note_or_answer)
+    global action_type
+    action_type = btn.cget("value")
+    print("Action type changed to:", action_type)
 
 if __name__ == "__main__":
     gui = Tk()
@@ -52,8 +54,14 @@ if __name__ == "__main__":
         for j in range(3):
             for x in range(3):
                 for y in range(3):
-                    button = Button(subframes[i][j], text="", command=lambda: cell_button_clicked(button), width=2, height=2) 
-                    button.grid(row=x, column=y, padx=0, pady=0)
+                    cell_button = Button(
+                        subframes[i][j],
+                        text="",
+                        width=2,
+                        height=2
+                    )
+                    cell_button.config(command=lambda b=cell_button: cell_button_clicked(b))
+                    cell_button.grid(row=x, column=y, padx=0, pady=0)
 
 
     # Create a frame for the buttons
@@ -102,10 +110,11 @@ if __name__ == "__main__":
     note_radio = Radiobutton(action_frame, text="Note", command=lambda: note_answer_changed(note_radio), variable=selected, value=0, anchor="w")
     note_radio.grid(row=1, column=0, sticky="w")
     
-
     answer_radio = Radiobutton(action_frame, text="Answer", command=lambda: note_answer_changed(answer_radio), variable=selected, value=1, anchor="w")
     answer_radio.grid(row=2, column=0, sticky="w")
     answer_radio.select()
 
+    erase_radio = Radiobutton(action_frame, text="Erase", command=lambda: note_answer_changed(erase_radio), variable=selected, value=2, anchor="w")
+    erase_radio.grid(row=3, column=0, sticky="w")
 
     gui.mainloop() 
