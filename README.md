@@ -11,5 +11,5 @@ A Sudoku game made in Python using TKinter
 - ~~Create and implement an eraser function and button~~
 - Consider if I can even actually implement a note system
 - Initiate board at start
-
+- Switch answer and note positions
 
