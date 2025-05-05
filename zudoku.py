@@ -1,8 +1,8 @@
 from tkinter import *
+from tkinter import messagebox
+import board
 
 current_number = 1
-
-# note = 0 # answer = 1
 action_type = 1
 
 def number_button_clicked(number, button):
@@ -13,19 +13,63 @@ def number_button_clicked(number, button):
         if btn != button:
             btn.config(relief="raised")
 
+    for i in range(9):
+        for j in range(9):
+            if cell_buttons[i][j].cget("text") == str(current_number):
+                cell_buttons[i][j].config(bg="dark gray")
+            else:
+                cell_buttons[i][j].config(bg="lightgray")
+
 def cell_button_clicked(button):
     global current_number
-    if action_type == 1:
+    if action_type == 0:
+        print("not implemented yet")
+    elif action_type == 1 and button.cget("text") == "":
         button.config(text=str(current_number))
+        button.config(bg="dark gray")
+        check()
     elif action_type == 2:
         button.config(text="")
     else:
-        print("not implemented yet")
+        print("Invalid action")
 
-def note_answer_changed(btn):
+def note_answer_changed(button):
     global action_type
-    action_type = btn.cget("value")
-    print("Action type changed to:", action_type)
+    action_type = button.cget("value")
+
+
+def new_board(difficulty):
+    game_board = board.generate_full_board(difficulty)
+
+
+    for i in range(9):
+        for j in range(9):
+            cell_buttons[i][j].config(bg="lightgray")
+            if game_board[i][j] != 0:
+                cell_buttons[i][j].config(text=str(game_board[i][j]))
+            else:
+                cell_buttons[i][j].config(text="")
+    number_button_clicked(1, one_button)
+
+def check():    
+    for i in range(9):
+        for j in range(9):
+            if cell_buttons[i][j].cget("text") == "":
+                return
+            
+    game_board = [[0]*9 for _ in range(9)]
+
+    for i in range(9):
+        for j in range(9):
+            game_board[i][j] = int(cell_buttons[i][j].cget("text"))
+    if board.board_is_valid(game_board):
+        messagebox.showinfo("Success", "Congratulations! You solved the puzzle!")
+    else:
+        messagebox.showerror("Error", "The solution is incorrect. Please try again.")
+
+    
+
+
 
 if __name__ == "__main__":
     gui = Tk()
@@ -49,11 +93,19 @@ if __name__ == "__main__":
         for j in range(3):
             subframes[i][j].grid(row=i, column=j)
 
+    # Create a 2D list to store references to the cell buttons
+    cell_buttons = [[None for _ in range(9)] for _ in range(9)]
+
     # Create a 3x3 grid of buttons inside each subframe
     for i in range(3):
         for j in range(3):
             for x in range(3):
                 for y in range(3):
+                    # Calculate the global row and column indices
+                    global_row = i * 3 + x
+                    global_col = j * 3 + y
+
+                    # Create the button
                     cell_button = Button(
                         subframes[i][j],
                         text="",
@@ -63,14 +115,18 @@ if __name__ == "__main__":
                     cell_button.config(command=lambda b=cell_button: cell_button_clicked(b))
                     cell_button.grid(row=x, column=y, padx=0, pady=0)
 
+                    # Store the button in the 2D list
+                    cell_buttons[global_row][global_col] = cell_button
+
 
     # Create a frame for the buttons
     button_frame = Frame(main_frame)
     button_frame.grid(row=1, column=0, padx=20, pady=20)
 
     # Number Buttons
-    one_button = Button(button_frame, text="1", command=lambda: number_button_clicked(1, one_button), width=2, height=2, relief="sunken")
+    one_button = Button(button_frame, text="1", command=lambda: number_button_clicked(1, one_button), width=2, height=2)
     one_button.grid(row=0, column=0)
+    
 
     two_button = Button(button_frame, text="2", command=lambda: number_button_clicked(2, two_button), width=2, height=2)
     two_button.grid(row=0, column=1)
@@ -97,24 +153,60 @@ if __name__ == "__main__":
     nine_button.grid(row=0, column=8)
 
     number_buttons = [one_button, two_button, three_button, four_button, five_button, six_button, seven_button, eight_button, nine_button]
+    
 
     # Create frame for the action buttons
     action_frame = Frame(main_frame)
     action_frame.grid(row=0, column=1, padx=20, pady=20)
 
     # Action buttons
-    note_answer_label = Label(action_frame, text="Mode:", font=("Arial", 10))
-    note_answer_label.grid(row=0, column=0)
+    new_game_button = Button(action_frame, text="New Game", command=lambda: new_board(difficulty_selected.get()), width=10)
+    new_game_button.grid(row=0, column=0, pady=5)
 
-    selected = StringVar()
-    note_radio = Radiobutton(action_frame, text="Note", command=lambda: note_answer_changed(note_radio), variable=selected, value=0, anchor="w")
-    note_radio.grid(row=1, column=0, sticky="w")
-    
-    answer_radio = Radiobutton(action_frame, text="Answer", command=lambda: note_answer_changed(answer_radio), variable=selected, value=1, anchor="w")
-    answer_radio.grid(row=2, column=0, sticky="w")
-    answer_radio.select()
+    difficulty_label = Label(action_frame, text="Difficulty:", font=("Arial", 10))
+    difficulty_label.grid(row=1, column=0, pady=5, sticky="w")
 
-    erase_radio = Radiobutton(action_frame, text="Erase", command=lambda: note_answer_changed(erase_radio), variable=selected, value=2, anchor="w")
-    erase_radio.grid(row=3, column=0, sticky="w")
+    difficulty_selected = IntVar(value=0)
+    easy_radio = Radiobutton(action_frame, text="Easy (default)", variable=difficulty_selected, value=0, anchor="w")
+    easy_radio.grid(row=2, column=0, sticky="w")
 
+    medium_radio = Radiobutton(action_frame, text="Medium", variable=difficulty_selected, value=1, anchor="w")
+    medium_radio.grid(row=3, column=0, sticky="w")
+
+    hard_radio = Radiobutton(action_frame, text="Hard", variable=difficulty_selected, value=2, anchor="w")
+    hard_radio.grid(row=4, column=0, sticky="w")
+
+    note_answer_label = Label(action_frame, text="Current Entry Mode:", font=("Arial", 10))
+    note_answer_label.grid(row=5, column=0, pady=5, sticky="w")
+
+    action_selected = IntVar(value=1)
+    note_radio = Radiobutton(action_frame, text="Note", command=lambda: note_answer_changed(note_radio), variable=action_selected, value=0, anchor="w")
+    note_radio.grid(row=6, column=0, sticky="w")
+
+    answer_radio = Radiobutton(action_frame, text="Answer", command=lambda: note_answer_changed(answer_radio), variable=action_selected, value=1, anchor="w")
+    answer_radio.grid(row=7, column=0, sticky="w")
+
+
+    erase_radio = Radiobutton(action_frame, text="Erase", command=lambda: note_answer_changed(erase_radio), variable=action_selected, value=2, anchor="w")
+    erase_radio.grid(row=8, column=0, sticky="w")
+    # End action buttons
+
+    # Test board solve function
+    # solved_board = [
+    # [5, 3, 4, 6, 7, 8, 9, 1, 2],
+    # [6, 7, 2, 1, 9, 5, 3, 4, 8],
+    # [1, 9, 8, 3, 4, 2, 5, 6, 7],
+    # [8, 5, 9, 7, 6, 1, 4, 2, 3],
+    # [4, 2, 6, 8, 5, 3, 7, 9, 1],
+    # [7, 1, 3, 9, 2, 4, 8, 5, 6],
+    # [9, 6, 1, 5, 3, 7, 2, 8, 4],
+    # [2, 8, 7, 4, 1, 9, 6, 3, 5],
+    # [3, 4, 5, 2, 8, 6, 1, 7, 9]
+    # ]
+
+    # print(board.board_is_valid(solved_board))
+
+
+    # Initialize the game board on startup
+    new_board(0)
     gui.mainloop() 
