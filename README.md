@@ -15,5 +15,6 @@ A Sudoku game made in Python using TKinter
 # To-do
 - Consider if I can even actually implement a note system
 - Do I want to keep the current number selected when a new game starts? Currently goes back to 1
+- Optional styling options ie nightmode
 
 
