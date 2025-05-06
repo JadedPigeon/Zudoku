@@ -26,9 +26,8 @@ def cell_button_clicked(button):
     elif action_type == 1 and button.cget("text") == "":
         button.config(text=str(current_number))
         button.config(bg="dark gray")
-        # Check for duplicates in same box
-        print("Button clicked:", button.cget("text"))
-        check_box(button)
+        # Check for duplicates in same box, row, and column
+        check_dupes(button)
         # Check if the board is complete
         check()
     elif action_type == 2:
@@ -73,20 +72,16 @@ def check():
     else:
         messagebox.showerror("Error", "The solution is incorrect. Please try again.")
 
-def check_box(button):
-    print("Checking box for duplicates...")
+def check_dupes(button):
+    # Checks for duplicates in the same box, row, and column
     num = button.cget("text")
     # Get the row and column of the button within its subgrid
     local_row = int(button.grid_info()["row"])
     local_col = int(button.grid_info()["column"])
 
-    print("Local Row:", local_row)
-    print("Local Column:", local_col)
-
     # Calculate the global row and column indices
     # Identify which subgrid the button belongs to
     parent_subgrid = button.master  # The parent frame (subgrid) of the button
-    print(parent_subgrid)
     for i in range(3):
         for j in range(3):
             if subframes[i][j] == parent_subgrid:
@@ -98,9 +93,6 @@ def check_box(button):
     global_row = subgrid_row * 3
     global_col = subgrid_col * 3
 
-    print("Global Row:", global_row)
-    print("Global Column:", global_col)
-
     # Check for duplicates in the same box
     for i in range(3):
         for j in range(3):
@@ -109,6 +101,21 @@ def check_box(button):
             if cell_buttons[global_row + i][global_col + j].cget("text") == num:
                 button.config(bg="red")
                 return
+            
+    # Check for duplicates in the same row
+    for i in range(9):
+        if i == global_row:
+            continue
+        if cell_buttons[i][global_col].cget("text") == num:
+            button.config(bg="red")
+            return
+    # Check for duplicates in the same column
+    for i in range(9):
+        if i == global_col:
+            continue
+        if cell_buttons[global_row][i].cget("text") == num:
+            button.config(bg="red")
+            return
 
 
 

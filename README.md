@@ -13,15 +13,19 @@ A Sudoku game made in Python using TKinter
 9. Display success/failure message when all cells are filled
 10. Implemented difficulty system
 11. Maintain selected number after starting new board
+12. Warn the user if they have a dupe in same 3x3 grid
+13. Warn the user if they have a dupe in the same row or column
 
 # To-do
 - Consider if I can even actually implement a note system
 - Optional styling options ie nightmode
-- Warn the user if they have more than one number in the same 3x3 grid
 - Add timer
 - Consider adding a hint button to fill a single correct cell
 - Add a check button that checks all the users entries so far
 - Reset button to go back to original board they started with
 - Save/load
+- Undo button
+- Warn user if one of that number already exists in a the same row/column
+- Erase restores color of dupe cells
 
 
