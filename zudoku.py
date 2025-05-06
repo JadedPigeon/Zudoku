@@ -21,12 +21,15 @@ def number_button_clicked(number, button):
                 cell_buttons[i][j].config(bg="lightgray")
 
 def cell_button_clicked(button):
-    #global current_number
     if action_type == 0:
         print("not implemented yet")
     elif action_type == 1 and button.cget("text") == "":
         button.config(text=str(current_number))
         button.config(bg="dark gray")
+        # Check for duplicates in same box
+        print("Button clicked:", button.cget("text"))
+        check_box(button)
+        # Check if the board is complete
         check()
     elif action_type == 2:
         button.config(text="")
@@ -39,7 +42,7 @@ def note_answer_changed(button):
 
 
 def new_board(difficulty):
-    #global current_number
+    global game_board
     game_board = board.generate_full_board(difficulty)
 
     for i in range(9):
@@ -49,13 +52,16 @@ def new_board(difficulty):
                 cell_buttons[i][j].config(text=str(game_board[i][j]))
             else:
                 cell_buttons[i][j].config(text="")
-    number_button_clicked(1, one_button)
+    # Keep the current number button pressed
+    associated_button = number_button_map.get(current_number)
+    if associated_button:
+        number_button_clicked(current_number, associated_button)
 
 def check():    
     for i in range(9):
         for j in range(9):
             if cell_buttons[i][j].cget("text") == "":
-                return
+                return    
             
     game_board = [[0]*9 for _ in range(9)]
 
@@ -67,7 +73,42 @@ def check():
     else:
         messagebox.showerror("Error", "The solution is incorrect. Please try again.")
 
-    
+def check_box(button):
+    print("Checking box for duplicates...")
+    num = button.cget("text")
+    # Get the row and column of the button within its subgrid
+    local_row = int(button.grid_info()["row"])
+    local_col = int(button.grid_info()["column"])
+
+    print("Local Row:", local_row)
+    print("Local Column:", local_col)
+
+    # Calculate the global row and column indices
+    # Identify which subgrid the button belongs to
+    parent_subgrid = button.master  # The parent frame (subgrid) of the button
+    print(parent_subgrid)
+    for i in range(3):
+        for j in range(3):
+            if subframes[i][j] == parent_subgrid:
+                subgrid_row = i
+                subgrid_col = j
+                break
+
+    # Calculate the global row and column indices
+    global_row = subgrid_row * 3
+    global_col = subgrid_col * 3
+
+    print("Global Row:", global_row)
+    print("Global Column:", global_col)
+
+    # Check for duplicates in the same box
+    for i in range(3):
+        for j in range(3):
+            if i == local_row and j == local_col:
+                continue
+            if cell_buttons[global_row + i][global_col + j].cget("text") == num:
+                button.config(bg="red")
+                return
 
 
 
@@ -154,6 +195,17 @@ if __name__ == "__main__":
 
     number_buttons = [one_button, two_button, three_button, four_button, five_button, six_button, seven_button, eight_button, nine_button]
     
+    number_button_map = {
+    1: one_button,
+    2: two_button,
+    3: three_button,
+    4: four_button,
+    5: five_button,
+    6: six_button,
+    7: seven_button,
+    8: eight_button,
+    9: nine_button
+}
 
     # Create frame for the action buttons
     action_frame = Frame(main_frame)

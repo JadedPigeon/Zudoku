@@ -12,11 +12,16 @@ A Sudoku game made in Python using TKinter
 8. Highlight currently selected number
 9. Display success/failure message when all cells are filled
 10. Implemented difficulty system
+11. Maintain selected number after starting new board
 
 # To-do
 - Consider if I can even actually implement a note system
-- Do I want to keep the current number selected when a new game starts? Currently goes back to 1
 - Optional styling options ie nightmode
 - Warn the user if they have more than one number in the same 3x3 grid
 - Add timer
+- Consider adding a hint button to fill a single correct cell
+- Add a check button that checks all the users entries so far
+- Reset button to go back to original board they started with
+- Save/load
+
 
