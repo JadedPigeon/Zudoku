@@ -21,7 +21,7 @@ def number_button_clicked(number, button):
                 cell_buttons[i][j].config(bg="lightgray")
 
 def cell_button_clicked(button):
-    global current_number
+    #global current_number
     if action_type == 0:
         print("not implemented yet")
     elif action_type == 1 and button.cget("text") == "":
@@ -39,8 +39,8 @@ def note_answer_changed(button):
 
 
 def new_board(difficulty):
+    #global current_number
     game_board = board.generate_full_board(difficulty)
-
 
     for i in range(9):
         for j in range(9):
