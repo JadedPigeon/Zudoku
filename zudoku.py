@@ -1,9 +1,14 @@
 from tkinter import *
 from tkinter import messagebox
 import board
+import sys
 
 current_number = 1
 action_type = 1
+elapsed_time = 0
+not_paused = 1
+timer_after_id = None
+number_counts = {i: 0 for i in range(1, 10)}
 
 def number_button_clicked(number, button):
     global current_number
@@ -30,9 +35,11 @@ def cell_button_clicked(button):
         check_dupes(button)
         # Check if the board is complete
         check()
+        count_numbers()
     elif action_type == 2:
         button.config(text="")
         button.config(bg="lightgray")
+        count_numbers()
     else:
         print("Invalid action")
 
@@ -43,6 +50,10 @@ def note_answer_changed(button):
 
 def new_board(difficulty):
     global game_board
+    global elapsed_time
+    global number_counts
+    number_counts = {i: 0 for i in range(1, 10)}
+    
     game_board = board.generate_full_board(difficulty)
 
     for i in range(9):
@@ -56,6 +67,12 @@ def new_board(difficulty):
     associated_button = number_button_map.get(current_number)
     if associated_button:
         number_button_clicked(current_number, associated_button)
+
+    elapsed_time = 0
+    if not_paused == 0:
+        pause_play()    
+    
+    count_numbers()
 
 def check():    
     for i in range(9):
@@ -118,7 +135,65 @@ def check_dupes(button):
             button.config(bg="red")
             return
 
+def update_timer():
+    global elapsed_time
+    global timer_after_id
+    elapsed_time += 1
 
+    # Calculate minutes and seconds
+    minutes = elapsed_time // 60
+    seconds = elapsed_time % 60
+
+    elapsed_time_label.config(text=f"{minutes:02}:{seconds:02}")
+    timer_after_id = elapsed_time_label.after(1000, update_timer)   
+
+    if elapsed_time > 3600:  # 1 hour
+        sys.exit()
+
+def pause_play():
+    global not_paused
+    global timer_after_id
+    if not_paused == 0:
+        not_paused = 1
+        pause_button.config(text="||")
+        update_timer()
+    else:
+        not_paused = 0
+        pause_button.config(text=">")
+        if timer_after_id:
+            elapsed_time_label.after_cancel(timer_after_id)
+            timer_after_id = None
+
+def reset_timer():
+    global elapsed_time
+    global not_paused
+    global timer_after_id
+    elapsed_time = 0
+    elapsed_time_label.config(text="00:00")
+    not_paused = 1
+    pause_button.config(text="||")
+    if timer_after_id:
+        elapsed_time_label.after_cancel(timer_after_id)
+        timer_after_id = None
+    update_timer()
+
+def count_numbers():
+    # Count the numbers on the board
+    global number_counts
+    number_counts = {i: 0 for i in range(1, 10)}
+    for i in range(9):
+        for j in range(9):
+            if cell_buttons[i][j].cget("text") != "":
+                number_counts[int(cell_buttons[i][j].cget("text"))] += 1
+
+    for num in number_counts:
+        count_labels[num].config(text=f"({number_counts[num]})")
+
+    for num in number_counts:
+        if number_counts[num] >= 9:
+            number_buttons[num-1].config(state="disabled")
+        else:
+            number_buttons[num-1].config(state="normal")
 
 if __name__ == "__main__":
     gui = Tk()
@@ -130,9 +205,24 @@ if __name__ == "__main__":
     main_frame = Frame(gui)
     main_frame.pack()
 
+    # Timer
+    timer_frame = Frame(main_frame)
+    timer_frame.grid(row=0, column=2, padx=1, pady=30, sticky="n")
+
+    timer_label = Label(timer_frame, text="Timer: ", font=("Arial", 12))
+    timer_label.grid(row=0, column=0, padx=1, pady=1, sticky="w")
+    elapsed_time_label = Label(timer_frame, text="", font=("Arial", 12))
+    elapsed_time_label.grid(row=0, column=1, padx=1, pady=1, sticky="w")
+
+    pause_button = Button(timer_frame, text="||", command=pause_play)
+    pause_button.grid(row=1, column=1, padx=1, pady=1, sticky="w")
+
+    reset_timer_button = Button(timer_frame, text="Reset", command=reset_timer)
+    reset_timer_button.grid(row=1, column=0, padx=1, pady=1, sticky="w")
+
     # Create a frame for the grid
     grid_frame = Frame(main_frame, borderwidth=2, relief="solid")
-    grid_frame.grid(row=0, column=0, padx=20, pady=20)
+    grid_frame.grid(row=0, column=1, padx=1, pady=1)
 
     # Create 9 subframes for the 9 sections of the grid
     subframes = [[Frame(grid_frame, borderwidth=1, relief="solid") for _ in range(3)] for _ in range(3)]
@@ -170,36 +260,42 @@ if __name__ == "__main__":
 
     # Create a frame for the buttons
     button_frame = Frame(main_frame)
-    button_frame.grid(row=1, column=0, padx=20, pady=20)
+    button_frame.grid(row=1, column=1, padx=10, pady=10)
+
+    # Create a label for the number buttons
+    number_label = Label(button_frame, text="Select a number for Answer/Note modes:", font=("Arial", 10))
+    number_label.grid(row=0, column=0, columnspan=9, pady=5, sticky="w")
+    number_label_subtext = Label(button_frame, text="Numbers in parentheses is the count of how many are on the board", font=("Arial", 8))
+    number_label_subtext.grid(row=1, column=0, columnspan=9, sticky="w")
+    
 
     # Number Buttons
     one_button = Button(button_frame, text="1", command=lambda: number_button_clicked(1, one_button), width=2, height=2)
-    one_button.grid(row=0, column=0)
+    one_button.grid(row=2, column=0)
     
-
     two_button = Button(button_frame, text="2", command=lambda: number_button_clicked(2, two_button), width=2, height=2)
-    two_button.grid(row=0, column=1)
+    two_button.grid(row=2, column=1)
 
     three_button = Button(button_frame, text="3", command=lambda: number_button_clicked(3, three_button), width=2, height=2)
-    three_button.grid(row=0, column=2)
+    three_button.grid(row=2, column=2)
 
     four_button = Button(button_frame, text="4", command=lambda: number_button_clicked(4, four_button), width=2, height=2)
-    four_button.grid(row=0, column=3)
+    four_button.grid(row=2, column=3)
 
     five_button = Button(button_frame, text="5", command=lambda: number_button_clicked(5, five_button), width=2, height=2)
-    five_button.grid(row=0, column=4)
+    five_button.grid(row=2, column=4)
 
     six_button = Button(button_frame, text="6", command=lambda: number_button_clicked(6, six_button), width=2, height=2)
-    six_button.grid(row=0, column=5)
+    six_button.grid(row=2, column=5)
 
     seven_button = Button(button_frame, text="7", command=lambda: number_button_clicked(7, seven_button), width=2, height=2)
-    seven_button.grid(row=0, column=6)
+    seven_button.grid(row=2, column=6)
 
     eight_button = Button(button_frame, text="8", command=lambda: number_button_clicked(8, eight_button), width=2, height=2)
-    eight_button.grid(row=0, column=7)
+    eight_button.grid(row=2, column=7)
 
     nine_button = Button(button_frame, text="9", command=lambda: number_button_clicked(9, nine_button), width=2, height=2)
-    nine_button.grid(row=0, column=8)
+    nine_button.grid(row=2, column=8)
 
     number_buttons = [one_button, two_button, three_button, four_button, five_button, six_button, seven_button, eight_button, nine_button]
     
@@ -213,11 +309,19 @@ if __name__ == "__main__":
     7: seven_button,
     8: eight_button,
     9: nine_button
-}
+    }
+
+    # Create labels for the number counts
+    count_labels = {}
+
+    for i in range(1, 10):
+        count_labels[i] = Label(button_frame, text=f"({number_counts[i]})", font=("Arial", 10))
+        count_labels[i].grid(row=3, column=i-1, padx=5, pady=5)  
+  
 
     # Create frame for the action buttons
     action_frame = Frame(main_frame)
-    action_frame.grid(row=0, column=1, padx=20, pady=20)
+    action_frame.grid(row=0, column=2, padx=20, pady=20)
 
     # Action buttons
     new_game_button = Button(action_frame, text="New Game", command=lambda: new_board(difficulty_selected.get()), width=10)
@@ -240,12 +344,12 @@ if __name__ == "__main__":
     note_answer_label.grid(row=5, column=0, pady=5, sticky="w")
 
     action_selected = IntVar(value=1)
-    note_radio = Radiobutton(action_frame, text="Note", command=lambda: note_answer_changed(note_radio), variable=action_selected, value=0, anchor="w")
-    note_radio.grid(row=6, column=0, sticky="w")
 
     answer_radio = Radiobutton(action_frame, text="Answer", command=lambda: note_answer_changed(answer_radio), variable=action_selected, value=1, anchor="w")
-    answer_radio.grid(row=7, column=0, sticky="w")
+    answer_radio.grid(row=6, column=0, sticky="w")
 
+    note_radio = Radiobutton(action_frame, text="Note", command=lambda: note_answer_changed(note_radio), variable=action_selected, value=0, anchor="w")
+    note_radio.grid(row=7, column=0, sticky="w")
 
     erase_radio = Radiobutton(action_frame, text="Erase", command=lambda: note_answer_changed(erase_radio), variable=action_selected, value=2, anchor="w")
     erase_radio.grid(row=8, column=0, sticky="w")
@@ -269,4 +373,9 @@ if __name__ == "__main__":
 
     # Initialize the game board on startup
     new_board(0)
+
+    update_timer()
+
     gui.mainloop() 
+
+    
