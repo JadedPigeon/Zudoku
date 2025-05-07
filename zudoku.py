@@ -29,6 +29,9 @@ def cell_button_clicked(button):
     if action_type == 0:
         print("not implemented yet")
     elif action_type == 1 and button.cget("text") == "":
+        if number_buttons[current_number-1].cget("state") == "disabled":
+            messagebox.showerror("Too many numbers", "You already have 9 instances of this number on the board. Please erase one before adding another.")
+            return    
         button.config(text=str(current_number))
         button.config(bg="dark gray")
         # Check for duplicates in same box, row, and column
