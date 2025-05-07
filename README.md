@@ -51,6 +51,7 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 16. Timer will reset with a new game and start again
 17. Added a count for each existing number that updates when new numbers are added/erased to the board, or a new game starts
 18. Fixed bug with dupe detection
+19. Alert user if they try to enter a number they already have 9 of on the board
 
 # To-do
 - Consider if I can even actually implement a note system

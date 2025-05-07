@@ -90,7 +90,7 @@ def check():
         for j in range(9):
             game_board[i][j] = int(cell_buttons[i][j].cget("text"))
     if board.board_is_valid(game_board):
-        messagebox.showinfo("Success", "Congratulations! You solved the puzzle!")
+        messagebox.showinfo("Success", f"Congratulations! You solved the puzzle in {elapsed_time_label.config('text')[4]}!")
     else:
         messagebox.showerror("Error", "The solution is incorrect. Please try again.")
 
