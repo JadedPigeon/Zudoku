@@ -32,10 +32,11 @@ def cell_button_clicked(button):
         button.config(text=str(current_number))
         button.config(bg="dark gray")
         # Check for duplicates in same box, row, and column
-        check_dupes(button)
+        
         # Check if the board is complete
         check()
         count_numbers()
+        check_dupes(button)
     elif action_type == 2:
         button.config(text="")
         button.config(bg="lightgray")
@@ -91,13 +92,15 @@ def check():
         messagebox.showerror("Error", "The solution is incorrect. Please try again.")
 
 def check_dupes(button):
-    # Checks for duplicates in the same box, row, and column
+    # Get the number in the button
     num = button.cget("text")
+    if num == "":  # Skip empty cells
+        return
+
     # Get the row and column of the button within its subgrid
     local_row = int(button.grid_info()["row"])
     local_col = int(button.grid_info()["column"])
 
-    # Calculate the global row and column indices
     # Identify which subgrid the button belongs to
     parent_subgrid = button.master  # The parent frame (subgrid) of the button
     for i in range(3):
@@ -106,34 +109,50 @@ def check_dupes(button):
                 subgrid_row = i
                 subgrid_col = j
                 break
-
+  
     # Calculate the global row and column indices
-    global_row = subgrid_row * 3
-    global_col = subgrid_col * 3
+    global_row = subgrid_row * 3 + local_row
+    global_col = subgrid_col * 3 + local_col
 
     # Check for duplicates in the same box
-    for i in range(3):
-        for j in range(3):
-            if i == local_row and j == local_col:
-                continue
-            if cell_buttons[global_row + i][global_col + j].cget("text") == num:
-                button.config(bg="red")
-                return
-            
+    for j in range(3):
+        # Calculate the actual row and column in the grid
+        row = global_row - (global_row % 3) + i
+        col = global_col - (global_col % 3) + j
+
+        # Skip if the indices are out of bounds (safety check)
+        if row < 0 or row >= 9 or col < 0 or col >= 9:
+            continue
+
+        cell_value = cell_buttons[row][col].cget("text")
+
+        # Skip the current cell
+        if row == global_row and col == global_col:
+            continue
+
+        if cell_value == num:
+            button.config(bg="red")
+            return
+
     # Check for duplicates in the same row
     for i in range(9):
-        if i == global_row:
-            continue
-        if cell_buttons[i][global_col].cget("text") == num:
+        cell_value = cell_buttons[global_row][i].cget("text")
+        if i == global_col:
+            continue  # Skip the current cell
+        if cell_value == num:
             button.config(bg="red")
             return
+
     # Check for duplicates in the same column
     for i in range(9):
-        if i == global_col:
-            continue
-        if cell_buttons[global_row][i].cget("text") == num:
+        cell_value = cell_buttons[i][global_col].cget("text")
+        if i == global_row:
+            continue  # Skip the current cell
+        if cell_value == num:
             button.config(bg="red")
             return
+
+
 
 def update_timer():
     global elapsed_time
