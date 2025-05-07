@@ -32,6 +32,7 @@ def cell_button_clicked(button):
         check()
     elif action_type == 2:
         button.config(text="")
+        button.config(bg="lightgray")
     else:
         print("Invalid action")
 
