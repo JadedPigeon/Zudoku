@@ -63,6 +63,7 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 - Reset button to go back to original board they started with
 - Save/load
 - Undo button
-- Bug: Click valid cell, click another cell in the same box that would be valid if the first click wasn't made. Erase first click. Second click still shows red
+- Bug: Click valid cell, click another cell in the same box that would be valid if the first click wasn't made. Erase first click. Second click still shows red (Ignoring this defect for now because it's not a common workflow and the work around is to simply erase the number and enter it again)
+- Bug: If a dupe is marked red and you changet the selected number it changes back to light gray
 
 

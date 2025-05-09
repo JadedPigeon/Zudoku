@@ -9,6 +9,7 @@ elapsed_time = 0
 not_paused = 1
 timer_after_id = None
 number_counts = {i: 0 for i in range(1, 10)}
+reset_board = [[0]*9 for _ in range(9)]
 
 def number_button_clicked(number, button):
     global current_number
@@ -42,8 +43,28 @@ def cell_button_clicked(button):
         check_dupes(button)
     elif action_type == 2:
         button.config(text="")
-        button.config(bg="lightgray")
+        button.config(bg="lightgray")  # Reset to default background color
         count_numbers()
+
+        # Get the global row and column of the erased cell
+        global_row = int(button.grid_info()["row"])
+        global_col = int(button.grid_info()["column"])
+
+        # Revalidate the row
+        for col in range(9):
+            check_dupes(cell_buttons[global_row][col])
+
+        # Revalidate the column
+        for row in range(9):
+            check_dupes(cell_buttons[row][global_col])
+
+        # Revalidate the subgrid
+        subgrid_row_start = global_row - (global_row % 3)
+        subgrid_col_start = global_col - (global_col % 3)
+        for i in range(3):
+            for j in range(3):
+                check_dupes(cell_buttons[subgrid_row_start + i][subgrid_col_start + j])
+        
     else:
         print("Invalid action")
 
@@ -52,13 +73,18 @@ def note_answer_changed(button):
     action_type = button.cget("value")
 
 
-def new_board(difficulty):
+def new_board(difficulty, reset=False):
     global game_board
+    global reset_board
     global elapsed_time
     global number_counts
     number_counts = {i: 0 for i in range(1, 10)}
     
-    game_board = board.generate_full_board(difficulty)
+    if not reset:
+        game_board = board.generate_full_board(difficulty)
+        reset_board = game_board.copy()
+    else:
+        game_board = reset_board.copy()
 
     for i in range(9):
         for j in range(9):
@@ -227,20 +253,11 @@ if __name__ == "__main__":
     main_frame = Frame(gui)
     main_frame.pack()
 
-    # Timer
-    timer_frame = Frame(main_frame)
-    timer_frame.grid(row=0, column=2, padx=1, pady=30, sticky="n")
+    # # Timer
+    # timer_frame = Frame(main_frame)
+    # timer_frame.grid(row=0, column=2, padx=1, pady=30, sticky="n")
 
-    timer_label = Label(timer_frame, text="Timer: ", font=("Arial", 12))
-    timer_label.grid(row=0, column=0, padx=1, pady=1, sticky="w")
-    elapsed_time_label = Label(timer_frame, text="", font=("Arial", 12))
-    elapsed_time_label.grid(row=0, column=1, padx=1, pady=1, sticky="w")
-
-    pause_button = Button(timer_frame, text="||", command=pause_play)
-    pause_button.grid(row=1, column=1, padx=1, pady=1, sticky="w")
-
-    reset_timer_button = Button(timer_frame, text="Reset", command=reset_timer)
-    reset_timer_button.grid(row=1, column=0, padx=1, pady=1, sticky="w")
+    
 
     # Create a frame for the grid
     grid_frame = Frame(main_frame, borderwidth=2, relief="solid")
@@ -343,38 +360,62 @@ if __name__ == "__main__":
 
     # Create frame for the action buttons
     action_frame = Frame(main_frame)
-    action_frame.grid(row=0, column=2, padx=20, pady=20)
+    action_frame.grid(row=0, column=2, padx=20, pady=30)
+
+    # Create a subframe for the timer
+    timer_frame = Frame(action_frame)
+    timer_frame.grid(row=0, column=0, padx=0, pady=0, sticky="w")
+
+    # Timer
+    timer_label = Label(timer_frame, text="Timer: ", font=("Arial", 12))
+    timer_label.grid(row=0, column=0, padx=0, pady=1, sticky="w")
+
+    elapsed_time_label = Label(timer_frame, text="", font=("Arial", 12))
+    elapsed_time_label.grid(row=0, column=1, padx=5, pady=1)
+
+    pause_button = Button(timer_frame, text="||", command=pause_play)
+    pause_button.grid(row=1, column=0, padx=1, pady=5)
+
+    reset_timer_button = Button(timer_frame, text="Reset", command=reset_timer)
+    reset_timer_button.grid(row=1, column=1, padx=5, pady=10, sticky="w")
+
 
     # Action buttons
+    game_options_label = Label(action_frame, text="Game Options:", font=("Arial", 10))
+    game_options_label.grid(row=1, column=0, pady=5, sticky="w")
+
     new_game_button = Button(action_frame, text="New Game", command=lambda: new_board(difficulty_selected.get()), width=10)
-    new_game_button.grid(row=0, column=0, pady=5)
+    new_game_button.grid(row=2, column=0, pady=5)
+
+    reset_board_button = Button(action_frame, text="Reset Board", command=lambda: new_board(difficulty_selected.get(), True), width=10)
+    reset_board_button.grid(row=3, column=0, pady=5)
 
     difficulty_label = Label(action_frame, text="Difficulty:", font=("Arial", 10))
-    difficulty_label.grid(row=1, column=0, pady=5, sticky="w")
+    difficulty_label.grid(row=4, column=0, pady=5, sticky="w")
 
     difficulty_selected = IntVar(value=0)
     easy_radio = Radiobutton(action_frame, text="Easy (default)", variable=difficulty_selected, value=0, anchor="w")
-    easy_radio.grid(row=2, column=0, sticky="w")
+    easy_radio.grid(row=5, column=0, sticky="w")
 
     medium_radio = Radiobutton(action_frame, text="Medium", variable=difficulty_selected, value=1, anchor="w")
-    medium_radio.grid(row=3, column=0, sticky="w")
+    medium_radio.grid(row=6, column=0, sticky="w")
 
     hard_radio = Radiobutton(action_frame, text="Hard", variable=difficulty_selected, value=2, anchor="w")
-    hard_radio.grid(row=4, column=0, sticky="w")
+    hard_radio.grid(row=7, column=0, sticky="w")
 
     note_answer_label = Label(action_frame, text="Current Entry Mode:", font=("Arial", 10))
-    note_answer_label.grid(row=5, column=0, pady=5, sticky="w")
+    note_answer_label.grid(row=8, column=0, pady=5, sticky="w")
 
     action_selected = IntVar(value=1)
 
     answer_radio = Radiobutton(action_frame, text="Answer", command=lambda: note_answer_changed(answer_radio), variable=action_selected, value=1, anchor="w")
-    answer_radio.grid(row=6, column=0, sticky="w")
+    answer_radio.grid(row=9, column=0, sticky="w")
 
     note_radio = Radiobutton(action_frame, text="Note", command=lambda: note_answer_changed(note_radio), variable=action_selected, value=0, anchor="w")
-    note_radio.grid(row=7, column=0, sticky="w")
+    note_radio.grid(row=10, column=0, sticky="w")
 
     erase_radio = Radiobutton(action_frame, text="Erase", command=lambda: note_answer_changed(erase_radio), variable=action_selected, value=2, anchor="w")
-    erase_radio.grid(row=8, column=0, sticky="w")
+    erase_radio.grid(row=11, column=0, sticky="w")
     # End action buttons
 
     # Test board solve function
@@ -389,7 +430,6 @@ if __name__ == "__main__":
     # [2, 8, 7, 4, 1, 9, 6, 3, 5],
     # [3, 4, 5, 2, 8, 6, 1, 7, 9]
     # ]
-
     # print(board.board_is_valid(solved_board))
 
 
