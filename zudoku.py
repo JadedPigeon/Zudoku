@@ -248,6 +248,17 @@ def button_subgrid(button):
 
     return global_row, global_col
 
+def undo_move():
+    if moves_stack:
+        last_move = moves_stack.pop()
+        row, col, _ = last_move
+        cell_buttons[row][col].config(text="")
+        cell_buttons[row][col].config(bg="lightgray")  # Reset to default background color
+        count_numbers()
+
+    else:
+        messagebox.showinfo("Undo", "No moves to undo.")
+
 if __name__ == "__main__":
     gui = Tk()
 
@@ -421,6 +432,9 @@ if __name__ == "__main__":
 
     erase_radio = Radiobutton(action_frame, text="Erase", command=lambda: note_answer_changed(erase_radio), variable=action_selected, value=2, anchor="w")
     erase_radio.grid(row=11, column=0, sticky="w")
+
+    undo_botton = Button(action_frame, text="Undo", command=lambda: undo_move(), width=10)
+    undo_botton.grid(row=12, column=0, pady=5, sticky="w")
     # End action buttons
 
     # Test board solve function
