@@ -53,7 +53,10 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 18. Fixed bug with dupe detection
 19. Alert user if they try to enter a number they already have 9 of on the board
 20. Added completion time to congratulations pop up
-21. to do
+21. Reformatted the timer section to be a subframe of actions instead of it's own separate frame
+22. Added a Reset functionality
+23. Refactor code to use a helper function to determine a cell button's position in the grid
+24. Refactor dupe code to simplify it and make it more consistent
 
 # To-do
 - Consider if I can even actually implement a note system
@@ -63,6 +66,10 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 - Reset button to go back to original board they started with
 - Save/load
 - Undo button
+- Highscore system
+- Should erase alert the user if used on a blank cell?
+
+# Bugs
 - Bug: Click valid cell, click another cell in the same box that would be valid if the first click wasn't made. Erase first click. Second click still shows red (Ignoring this defect for now because it's not a common workflow and the work around is to simply erase the number and enter it again)
 - Bug: If a dupe is marked red and you changet the selected number it changes back to light gray
 

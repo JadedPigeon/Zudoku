@@ -11,6 +11,8 @@ timer_after_id = None
 number_counts = {i: 0 for i in range(1, 10)}
 reset_board = [[0]*9 for _ in range(9)]
 
+moves_stack = []
+
 def number_button_clicked(number, button):
     global current_number
     current_number = number
@@ -35,9 +37,10 @@ def cell_button_clicked(button):
             return    
         button.config(text=str(current_number))
         button.config(bg="dark gray")
-        # Check for duplicates in same box, row, and column
-        
-        # Check if the board is complete
+        move_row, move_col = button_subgrid(button)
+        move_made = [move_row, move_col, str(current_number)]
+        moves_stack.append(move_made)
+        # Check if the board is complete, update numbers used, check for dupes
         check()
         count_numbers()
         check_dupes(button)
@@ -47,8 +50,7 @@ def cell_button_clicked(button):
         count_numbers()
 
         # Get the global row and column of the erased cell
-        global_row = int(button.grid_info()["row"])
-        global_col = int(button.grid_info()["column"])
+        global_row, global_col = button_subgrid(button)
 
         # Revalidate the row
         for col in range(9):
@@ -78,6 +80,9 @@ def new_board(difficulty, reset=False):
     global reset_board
     global elapsed_time
     global number_counts
+    global moves_stack
+
+    moves_stack = []
     number_counts = {i: 0 for i in range(1, 10)}
     
     if not reset:
@@ -130,38 +135,18 @@ def check_dupes(button):
     local_row = int(button.grid_info()["row"])
     local_col = int(button.grid_info()["column"])
 
-    # Identify which subgrid the button belongs to
-    parent_subgrid = button.master  # The parent frame (subgrid) of the button
-    for i in range(3):
-        for j in range(3):
-            if subframes[i][j] == parent_subgrid:
-                subgrid_row = i
-                subgrid_col = j
-                break
-  
     # Calculate the global row and column indices
-    global_row = subgrid_row * 3 + local_row
-    global_col = subgrid_col * 3 + local_col
+    global_row, global_col = button_subgrid(button)
 
     # Check for duplicates in the same box
-    for j in range(3):
-        # Calculate the actual row and column in the grid
-        row = global_row - (global_row % 3) + i
-        col = global_col - (global_col % 3) + j
-
-        # Skip if the indices are out of bounds (safety check)
-        if row < 0 or row >= 9 or col < 0 or col >= 9:
-            continue
-
-        cell_value = cell_buttons[row][col].cget("text")
-
-        # Skip the current cell
-        if row == global_row and col == global_col:
-            continue
-
-        if cell_value == num:
-            button.config(bg="red")
-            return
+    for i in range(3):
+        for j in range(3):
+            cell_value = cell_buttons[global_row - (global_row % 3) + i][global_col - (global_col % 3) + j].cget("text")
+            if (i == local_row and j == local_col) or cell_value == "":
+                continue
+            if cell_value == num:
+                button.config(bg="red")
+                return
 
     # Check for duplicates in the same row
     for i in range(9):
@@ -242,6 +227,26 @@ def count_numbers():
             number_buttons[num-1].config(state="disabled")
         else:
             number_buttons[num-1].config(state="normal")
+
+def button_subgrid(button):
+    # Get the row and column of the button within its subgrid
+    local_row = int(button.grid_info()["row"])
+    local_col = int(button.grid_info()["column"])
+
+    # Identify which subgrid the button belongs to
+    parent_subgrid = button.master  # The parent frame (subgrid) of the button
+    for i in range(3):
+        for j in range(3):
+            if subframes[i][j] == parent_subgrid:
+                subgrid_row = i
+                subgrid_col = j
+                break
+
+    # Calculate the global row and column indices
+    global_row = subgrid_row * 3 + local_row
+    global_col = subgrid_col * 3 + local_col
+
+    return global_row, global_col
 
 if __name__ == "__main__":
     gui = Tk()
