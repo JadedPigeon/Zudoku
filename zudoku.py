@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import board
 import sys
+import random
 
 current_number = 1
 action_type = 1
@@ -11,6 +12,7 @@ timer_after_id = None
 number_counts = {i: 0 for i in range(1, 10)}
 reset_board = [[0]*9 for _ in range(9)]
 solved_board = [[0]*9 for _ in range(9)]
+used_hint = False
 
 moves_stack = []
 
@@ -50,23 +52,24 @@ def cell_button_clicked(button):
         button.config(bg="lightgray")  # Reset to default background color
         count_numbers()
 
-        # Get the global row and column of the erased cell
-        global_row, global_col = button_subgrid(button)
+        # The following code is commented out because it appears to be a bug
+        # # Get the global row and column of the erased cell
+        # global_row, global_col = button_subgrid(button)
 
-        # Revalidate the row
-        for col in range(9):
-            check_dupes(cell_buttons[global_row][col])
+        # # Revalidate the row
+        # for col in range(9):
+        #     check_dupes(cell_buttons[global_row][col])
 
-        # Revalidate the column
-        for row in range(9):
-            check_dupes(cell_buttons[row][global_col])
+        # # Revalidate the column
+        # for row in range(9):
+        #     check_dupes(cell_buttons[row][global_col])
 
-        # Revalidate the subgrid
-        subgrid_row_start = global_row - (global_row % 3)
-        subgrid_col_start = global_col - (global_col % 3)
-        for i in range(3):
-            for j in range(3):
-                check_dupes(cell_buttons[subgrid_row_start + i][subgrid_col_start + j])
+        # # Revalidate the subgrid
+        # subgrid_row_start = global_row - (global_row % 3)
+        # subgrid_col_start = global_col - (global_col % 3)
+        # for i in range(3):
+        #     for j in range(3):
+        #         check_dupes(cell_buttons[subgrid_row_start + i][subgrid_col_start + j])
         
     else:
         print("Invalid action")
@@ -167,8 +170,6 @@ def check_dupes(button):
         if cell_value == num:
             button.config(bg="red")
             return
-
-
 
 def update_timer():
     global elapsed_time
@@ -273,7 +274,20 @@ def validate_current_board():
                     count += 1
     if count == 0:
         messagebox.showinfo("Validation", "The board is valid!")
-                
+
+def hint():
+    global used_hint
+    used_hint = True
+    positions = [(i, j) for i in range(9) for j in range(9)]
+    random.shuffle(positions)
+
+    for row, col in positions:
+        if cell_buttons[row][col].cget("text") == "":
+            cell_buttons[row][col].config(text=str(solved_board[row][col]))
+            cell_buttons[row][col].config(bg="lightblue")
+            moves_stack.append([row, col, str(solved_board[row][col])])
+            count_numbers()
+            return
 
 if __name__ == "__main__":
     gui = Tk()
@@ -443,7 +457,7 @@ if __name__ == "__main__":
     answer_radio = Radiobutton(action_frame, text="Answer", command=lambda: note_answer_changed(answer_radio), variable=action_selected, value=1, anchor="w")
     answer_radio.grid(row=9, column=0, sticky="w")
 
-    note_radio = Radiobutton(action_frame, text="Note", command=lambda: note_answer_changed(note_radio), variable=action_selected, value=0, anchor="w")
+    note_radio = Radiobutton(action_frame, text="Note", command=lambda: note_answer_changed(note_radio), variable=action_selected, value=0, anchor="w", state="disabled")
     note_radio.grid(row=10, column=0, sticky="w")
 
     erase_radio = Radiobutton(action_frame, text="Erase", command=lambda: note_answer_changed(erase_radio), variable=action_selected, value=2, anchor="w")
@@ -454,6 +468,9 @@ if __name__ == "__main__":
 
     validate_button = Button(action_frame, text="Validate", command=validate_current_board, width=10)
     validate_button.grid(row=13, column=0, pady=5, sticky="w")
+
+    hint_button = Button(action_frame, text="Hint", command=hint, width=10)
+    hint_button.grid(row=14, column=0, pady=5, sticky="w")
     # End action buttons
 
     # Test board solve function
