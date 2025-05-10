@@ -54,19 +54,17 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 19. Alert user if they try to enter a number they already have 9 of on the board
 20. Added completion time to congratulations pop up
 21. Reformatted the timer section to be a subframe of actions instead of it's own separate frame
-22. Added a Reset functionality
+22. Added a Reset button to go back to original board they started with
 23. Refactor code to use a helper function to determine a cell button's position in the grid
 24. Refactor dupe code to simplify it and make it more consistent
-25. Implemented undo functionality
+25. Implemented undo button to undo last move - works for full history of current game
+26. Implemented validate button that validates all moves so far
 
 # To-do
 - Consider if I can even actually implement a note system
 - Optional styling options ie nightmode
 - Consider adding a hint button to fill a single correct cell
-- Add a check button that checks all the users entries so far
-- Reset button to go back to original board they started with
 - Save/load
-- Undo button
 - Highscore system
 - Should erase alert the user if used on a blank cell?
 

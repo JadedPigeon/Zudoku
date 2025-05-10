@@ -1,5 +1,5 @@
 import random
-import time
+import copy
 
 def is_valid(board, row, col, num):
     # Cecks to make sure the number is not already in any row, column, or 3x3 grid
@@ -58,6 +58,7 @@ def fill_board(board):
 def generate_full_board(difficulty=0):
     board = [[0]*9 for _ in range(9)]
     fill_board(board)
+    solved_board = copy.deepcopy(board)
 
     clues = 0
     if difficulty == 0:
@@ -66,10 +67,9 @@ def generate_full_board(difficulty=0):
         clues = random.randint(30, 35)
     else:
         clues = random.randint(22, 30)
-
+    
     remove_clues(board, clues)
-
-    return board
+    return board, solved_board
 
 # Number of solutions - we only want one solution. We limit to 2 to speed up the process
 def has_unique_solution(board, limit=2):

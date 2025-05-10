@@ -10,6 +10,7 @@ not_paused = 1
 timer_after_id = None
 number_counts = {i: 0 for i in range(1, 10)}
 reset_board = [[0]*9 for _ in range(9)]
+solved_board = [[0]*9 for _ in range(9)]
 
 moves_stack = []
 
@@ -77,6 +78,7 @@ def note_answer_changed(button):
 
 def new_board(difficulty, reset=False):
     global game_board
+    global solved_board
     global reset_board
     global elapsed_time
     global number_counts
@@ -86,7 +88,7 @@ def new_board(difficulty, reset=False):
     number_counts = {i: 0 for i in range(1, 10)}
     
     if not reset:
-        game_board = board.generate_full_board(difficulty)
+        game_board, solved_board = board.generate_full_board(difficulty)
         reset_board = game_board.copy()
     else:
         game_board = reset_board.copy()
@@ -258,6 +260,20 @@ def undo_move():
 
     else:
         messagebox.showinfo("Undo", "No moves to undo.")
+
+def validate_current_board():
+    count = 0
+    for i in range(9):
+        for j in range(9):
+            cell_value = cell_buttons[i][j].cget("text")
+            if cell_value != "":
+                cell_value = int(cell_value)
+                if cell_value != solved_board[i][j]:
+                    cell_buttons[i][j].config(bg="red")
+                    count += 1
+    if count == 0:
+        messagebox.showinfo("Validation", "The board is valid!")
+                
 
 if __name__ == "__main__":
     gui = Tk()
@@ -433,8 +449,11 @@ if __name__ == "__main__":
     erase_radio = Radiobutton(action_frame, text="Erase", command=lambda: note_answer_changed(erase_radio), variable=action_selected, value=2, anchor="w")
     erase_radio.grid(row=11, column=0, sticky="w")
 
-    undo_botton = Button(action_frame, text="Undo", command=lambda: undo_move(), width=10)
+    undo_botton = Button(action_frame, text="Undo", command=undo_move, width=10)
     undo_botton.grid(row=12, column=0, pady=5, sticky="w")
+
+    validate_button = Button(action_frame, text="Validate", command=validate_current_board, width=10)
+    validate_button.grid(row=13, column=0, pady=5, sticky="w")
     # End action buttons
 
     # Test board solve function
