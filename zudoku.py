@@ -13,6 +13,7 @@ number_counts = {i: 0 for i in range(1, 10)}
 reset_board = [[0]*9 for _ in range(9)]
 solved_board = [[0]*9 for _ in range(9)]
 used_hint = False
+current_difficulty = 0
 
 moves_stack = []
 
@@ -86,7 +87,9 @@ def new_board(difficulty, reset=False):
     global elapsed_time
     global number_counts
     global moves_stack
+    global current_difficulty
 
+    current_difficulty = difficulty
     moves_stack = []
     number_counts = {i: 0 for i in range(1, 10)}
     
@@ -125,8 +128,10 @@ def check():
     for i in range(9):
         for j in range(9):
             game_board[i][j] = int(cell_buttons[i][j].cget("text"))
-    if board.board_is_valid(game_board):
+    if board.board_is_valid(game_board) and used_hint == False:
         messagebox.showinfo("Success", f"Congratulations! You solved the puzzle in {elapsed_time_label.config('text')[4]}!")
+    elif board.board_is_valid(game_board) and used_hint == True:
+        messagebox.showinfo("Success", f"Congratulations! You solved the puzzle in {elapsed_time_label.config('text')[4]}! You used a hint, so your time will not be recorded.")
     else:
         messagebox.showerror("Error", "The solution is incorrect. Please try again.")
 
@@ -287,7 +292,16 @@ def hint():
             cell_buttons[row][col].config(bg="lightblue")
             moves_stack.append([row, col, str(solved_board[row][col])])
             count_numbers()
+            check()
             return
+        
+def show_solution():
+    global used_hint
+    used_hint = True
+    for i in range(9):
+        for j in range(9):
+            cell_buttons[i][j].config(text=str(solved_board[i][j]))
+            count_numbers()
 
 if __name__ == "__main__":
     gui = Tk()
@@ -299,9 +313,21 @@ if __name__ == "__main__":
     main_frame = Frame(gui)
     main_frame.pack()
 
-    # # Timer
-    # timer_frame = Frame(main_frame)
-    # timer_frame.grid(row=0, column=2, padx=1, pady=30, sticky="n")
+    # # Highscores
+    highscores_frame = Frame(main_frame)
+    highscores_frame.grid(row=0, column=0, padx=10, pady=10, sticky="n")
+    highscores_label = Label(highscores_frame, text="Highscores", font=("Arial", 12))
+    highscores_label.grid(row=0, column=0, padx=5, pady=5)
+    highscores_list = Listbox(highscores_frame, width=30, height=10)
+    highscores_list.grid(row=1, column=0, padx=5, pady=5)
+    # Add some dummy highscores
+    highscores = [
+        "Player1 - 00:30",
+        "Player2 - 01:15",
+        "Player3 - 02:45"
+    ]
+    for score in highscores:
+        highscores_list.insert(END, score)
 
     
 
@@ -345,11 +371,11 @@ if __name__ == "__main__":
 
     # Create a frame for the buttons
     button_frame = Frame(main_frame)
-    button_frame.grid(row=1, column=1, padx=10, pady=10)
+    button_frame.grid(row=1, column=1, padx=10, pady=1, sticky="n")
 
     # Create a label for the number buttons
     number_label = Label(button_frame, text="Select a number for Answer/Note modes:", font=("Arial", 10))
-    number_label.grid(row=0, column=0, columnspan=9, pady=5, sticky="w")
+    number_label.grid(row=0, column=0, columnspan=9, pady=1, sticky="w")
     number_label_subtext = Label(button_frame, text="Numbers in parentheses is the count of how many are on the board", font=("Arial", 8))
     number_label_subtext.grid(row=1, column=0, columnspan=9, sticky="w")
     
@@ -413,10 +439,10 @@ if __name__ == "__main__":
     timer_frame.grid(row=0, column=0, padx=0, pady=0, sticky="w")
 
     # Timer
-    timer_label = Label(timer_frame, text="Timer: ", font=("Arial", 12))
+    timer_label = Label(timer_frame, text="Timer: ", font=("Arial", 10))
     timer_label.grid(row=0, column=0, padx=0, pady=1, sticky="w")
 
-    elapsed_time_label = Label(timer_frame, text="", font=("Arial", 12))
+    elapsed_time_label = Label(timer_frame, text="", font=("Arial", 10))
     elapsed_time_label.grid(row=0, column=1, padx=5, pady=1)
 
     pause_button = Button(timer_frame, text="||", command=pause_play)
@@ -471,6 +497,9 @@ if __name__ == "__main__":
 
     hint_button = Button(action_frame, text="Hint", command=hint, width=10)
     hint_button.grid(row=14, column=0, pady=5, sticky="w")
+
+    show_solution_button = Button(action_frame, text="Show Solution", command=show_solution, width=10)
+    show_solution_button.grid(row=15, column=0, pady=5, sticky="w")
     # End action buttons
 
     # Test board solve function
