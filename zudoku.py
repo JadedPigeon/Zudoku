@@ -315,16 +315,16 @@ if __name__ == "__main__":
 
     # # Highscores
     highscores_frame = Frame(main_frame)
-    highscores_frame.grid(row=0, column=0, padx=10, pady=10, sticky="n")
+    highscores_frame.grid(row=0, column=0, padx=1, pady=10, sticky="n")
     highscores_label = Label(highscores_frame, text="Highscores", font=("Arial", 12))
-    highscores_label.grid(row=0, column=0, padx=5, pady=5)
-    highscores_list = Listbox(highscores_frame, width=30, height=10)
-    highscores_list.grid(row=1, column=0, padx=5, pady=5)
+    highscores_label.grid(row=0, column=0, padx=1, pady=5)
+    highscores_list = Listbox(highscores_frame, width=25, height=10)
+    highscores_list.grid(row=1, column=0, padx=1, pady=5)
     # Add some dummy highscores
     highscores = [
-        "Player1 - 00:30",
-        "Player2 - 01:15",
-        "Player3 - 02:45"
+        "00:00, Easy, 2023-10-01",
+        "00:01, Medium, 2023-10-02",
+        "00:02, Hard, 2023-10-03",
     ]
     for score in highscores:
         highscores_list.insert(END, score)
