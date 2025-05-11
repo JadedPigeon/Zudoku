@@ -3,6 +3,7 @@ from tkinter import messagebox
 import board
 import sys
 import random
+from datetime import datetime
 
 current_number = 1
 action_type = 1
@@ -118,6 +119,9 @@ def new_board(difficulty, reset=False):
     count_numbers()
 
 def check():    
+    highscore_time = ""
+    highscore_date = ""
+    highscore_difficulty = ""
     for i in range(9):
         for j in range(9):
             if cell_buttons[i][j].cget("text") == "":
@@ -128,7 +132,19 @@ def check():
     for i in range(9):
         for j in range(9):
             game_board[i][j] = int(cell_buttons[i][j].cget("text"))
-    if board.board_is_valid(game_board) and used_hint == False:
+    if board.board_is_valid(game_board): #and used_hint == False:
+        # Calculate minutes and seconds
+        minutes = elapsed_time // 60
+        seconds = elapsed_time % 60
+        highscore_time = f"{minutes:02}:{seconds:02}"
+        if current_difficulty == 0:
+            highscore_difficulty = "Easy"
+        elif current_difficulty == 1:
+            highscore_difficulty = "Medium"
+        elif current_difficulty == 2:
+            highscore_difficulty = "Hard"
+        highscore_date = datetime.now().strftime("%Y-%m-%d")
+        save_highscore(highscore_time, highscore_difficulty, highscore_date)
         messagebox.showinfo("Success", f"Congratulations! You solved the puzzle in {elapsed_time_label.config('text')[4]}!")
     elif board.board_is_valid(game_board) and used_hint == True:
         messagebox.showinfo("Success", f"Congratulations! You solved the puzzle in {elapsed_time_label.config('text')[4]}! You used a hint, so your time will not be recorded.")
@@ -303,6 +319,40 @@ def show_solution():
             cell_buttons[i][j].config(text=str(solved_board[i][j]))
             count_numbers()
 
+def save_highscore(highscore_time, highscore_difficulty, highscore_date, filename="highscores.txt"):
+    # Load existing highscores
+    current_highscores = load_highscores(filename)
+
+    # Add the new highscore
+    current_highscores.append((highscore_date, highscore_time, highscore_difficulty))
+
+    # Sort highscores by time (convert mm:ss to seconds for comparison)
+    current_highscores.sort(key=lambda x: int(x[1].split(":")[0]) * 60 + int(x[1].split(":")[1]))
+
+    # Keep only the top 10 highscores
+    current_highscores = current_highscores[:10]
+
+    # Save the updated highscores back to the file
+    with open(filename, "w") as f:
+        for date, time, difficulty in current_highscores:
+            f.write(f"{date}, {time}, {difficulty}\n")
+
+def load_highscores(filename="highscores.txt"):
+    highscores = []
+    try:
+        with open(filename, "r") as f:
+            for line in f:
+                date, time, difficulty = line.strip().split(", ")
+                highscores.append((date, time, difficulty))
+    except FileNotFoundError:
+        pass  # If the file doesn't exist, start with an empty list
+
+    return highscores
+
+
+#################################################################################################
+# Main function to run the GUI
+#################################################################################################
 if __name__ == "__main__":
     gui = Tk()
 
@@ -318,17 +368,15 @@ if __name__ == "__main__":
     highscores_frame.grid(row=0, column=0, padx=1, pady=10, sticky="n")
     highscores_label = Label(highscores_frame, text="Highscores", font=("Arial", 12))
     highscores_label.grid(row=0, column=0, padx=1, pady=5)
-    highscores_list = Listbox(highscores_frame, width=25, height=10)
-    highscores_list.grid(row=1, column=0, padx=1, pady=5)
-    # Add some dummy highscores
-    highscores = [
-        "00:00, Easy, 2023-10-01",
-        "00:01, Medium, 2023-10-02",
-        "00:02, Hard, 2023-10-03",
-    ]
-    for score in highscores:
-        highscores_list.insert(END, score)
-
+    highscores_listbox = Listbox(highscores_frame, width=25, height=10)
+    highscores_listbox.grid(row=1, column=0, padx=1, pady=5)
+    
+    highscores_loaded = load_highscores()
+    print(highscores_listbox)
+    for date, time, difficulty in highscores_loaded:
+        score_string = f"{date} - {time} - {difficulty}"
+        print(score_string)
+        highscores_listbox.insert(END, score_string)
     
 
     # Create a frame for the grid
