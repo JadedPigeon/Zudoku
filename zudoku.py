@@ -439,66 +439,64 @@ if __name__ == "__main__":
     timer_frame.grid(row=0, column=0, padx=0, pady=0, sticky="w")
 
     # Timer
-    timer_label = Label(timer_frame, text="Timer: ", font=("Arial", 10))
+    timer_label = Label(timer_frame, text="Timer: ", font=("Arial", 8))
     timer_label.grid(row=0, column=0, padx=0, pady=1, sticky="w")
 
-    elapsed_time_label = Label(timer_frame, text="", font=("Arial", 10))
+    elapsed_time_label = Label(timer_frame, text="", font=("Arial", 8))
     elapsed_time_label.grid(row=0, column=1, padx=5, pady=1)
 
-    pause_button = Button(timer_frame, text="||", command=pause_play)
+    pause_button = Button(timer_frame, text="||", command=pause_play, font=("Arial", 8))
     pause_button.grid(row=1, column=0, padx=1, pady=5)
 
-    reset_timer_button = Button(timer_frame, text="Reset", command=reset_timer)
+    reset_timer_button = Button(timer_frame, text="Reset", command=reset_timer, font=("Arial", 8))
     reset_timer_button.grid(row=1, column=1, padx=5, pady=10, sticky="w")
 
-
     # Action buttons
-    game_options_label = Label(action_frame, text="Game Options:", font=("Arial", 10))
+    game_options_label = Label(action_frame, text="Game Options:", font=("Arial", 8))
     game_options_label.grid(row=1, column=0, pady=5, sticky="w")
 
-    new_game_button = Button(action_frame, text="New Game", command=lambda: new_board(difficulty_selected.get()), width=10)
+    new_game_button = Button(action_frame, text="New Game", command=lambda: new_board(difficulty_selected.get()), width=10, font=("Arial", 8))
     new_game_button.grid(row=2, column=0, pady=5)
 
-    reset_board_button = Button(action_frame, text="Reset Board", command=lambda: new_board(difficulty_selected.get(), True), width=10)
+    reset_board_button = Button(action_frame, text="Reset Board", command=lambda: new_board(difficulty_selected.get(), True), width=10, font=("Arial", 8))
     reset_board_button.grid(row=3, column=0, pady=5)
 
-    difficulty_label = Label(action_frame, text="Difficulty:", font=("Arial", 10))
+    difficulty_label = Label(action_frame, text="Difficulty:", font=("Arial", 8))
     difficulty_label.grid(row=4, column=0, pady=5, sticky="w")
 
-    difficulty_selected = IntVar(value=0)
-    easy_radio = Radiobutton(action_frame, text="Easy (default)", variable=difficulty_selected, value=0, anchor="w")
+    difficulty_selected = IntVar(value=0)  # This line remains untouched
+    easy_radio = Radiobutton(action_frame, text="Easy (default)", variable=difficulty_selected, value=0, anchor="w", font=("Arial", 8))
     easy_radio.grid(row=5, column=0, sticky="w")
 
-    medium_radio = Radiobutton(action_frame, text="Medium", variable=difficulty_selected, value=1, anchor="w")
+    medium_radio = Radiobutton(action_frame, text="Medium", variable=difficulty_selected, value=1, anchor="w", font=("Arial", 8))
     medium_radio.grid(row=6, column=0, sticky="w")
 
-    hard_radio = Radiobutton(action_frame, text="Hard", variable=difficulty_selected, value=2, anchor="w")
+    hard_radio = Radiobutton(action_frame, text="Hard", variable=difficulty_selected, value=2, anchor="w", font=("Arial", 8))
     hard_radio.grid(row=7, column=0, sticky="w")
 
-    note_answer_label = Label(action_frame, text="Current Entry Mode:", font=("Arial", 10))
+    note_answer_label = Label(action_frame, text="Current Entry Mode:", font=("Arial", 8))
     note_answer_label.grid(row=8, column=0, pady=5, sticky="w")
 
-    action_selected = IntVar(value=1)
-
-    answer_radio = Radiobutton(action_frame, text="Answer", command=lambda: note_answer_changed(answer_radio), variable=action_selected, value=1, anchor="w")
+    action_selected = IntVar(value=1)  # This line remains untouched
+    answer_radio = Radiobutton(action_frame, text="Answer", command=lambda: note_answer_changed(answer_radio), variable=action_selected, value=1, anchor="w", font=("Arial", 8))
     answer_radio.grid(row=9, column=0, sticky="w")
 
-    note_radio = Radiobutton(action_frame, text="Note", command=lambda: note_answer_changed(note_radio), variable=action_selected, value=0, anchor="w", state="disabled")
+    note_radio = Radiobutton(action_frame, text="Note", command=lambda: note_answer_changed(note_radio), variable=action_selected, value=0, anchor="w", state="disabled", font=("Arial", 8))
     note_radio.grid(row=10, column=0, sticky="w")
 
-    erase_radio = Radiobutton(action_frame, text="Erase", command=lambda: note_answer_changed(erase_radio), variable=action_selected, value=2, anchor="w")
+    erase_radio = Radiobutton(action_frame, text="Erase", command=lambda: note_answer_changed(erase_radio), variable=action_selected, value=2, anchor="w", font=("Arial", 8))
     erase_radio.grid(row=11, column=0, sticky="w")
 
-    undo_botton = Button(action_frame, text="Undo", command=undo_move, width=10)
+    undo_botton = Button(action_frame, text="Undo", command=undo_move, width=10, font=("Arial", 8))
     undo_botton.grid(row=12, column=0, pady=5, sticky="w")
 
-    validate_button = Button(action_frame, text="Validate", command=validate_current_board, width=10)
+    validate_button = Button(action_frame, text="Validate", command=validate_current_board, width=10, font=("Arial", 8))
     validate_button.grid(row=13, column=0, pady=5, sticky="w")
 
-    hint_button = Button(action_frame, text="Hint", command=hint, width=10)
+    hint_button = Button(action_frame, text="Hint", command=hint, width=10, font=("Arial", 8))
     hint_button.grid(row=14, column=0, pady=5, sticky="w")
 
-    show_solution_button = Button(action_frame, text="Show Solution", command=show_solution, width=10)
+    show_solution_button = Button(action_frame, text="Show Solution", command=show_solution, width=10, font=("Arial", 8))
     show_solution_button.grid(row=15, column=0, pady=5, sticky="w")
     # End action buttons
 
