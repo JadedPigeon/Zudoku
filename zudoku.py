@@ -4,6 +4,8 @@ import board
 import sys
 import random
 from datetime import datetime
+import json
+import os
 
 current_number = 1
 action_type = 1
@@ -13,6 +15,7 @@ timer_after_id = None
 number_counts = {i: 0 for i in range(1, 10)}
 reset_board = [[0]*9 for _ in range(9)]
 solved_board = [[0]*9 for _ in range(9)]
+game_board = [[0]*9 for _ in range(9)]
 used_hint = False
 current_difficulty = 0
 
@@ -95,25 +98,43 @@ def new_board(difficulty, reset=False):
     used_hint = False
 
     highscores_loaded = load_highscores()
+    current_difficulty = difficulty
     if current_difficulty == 0:
             highscore_difficulty = "Easy"
     elif current_difficulty == 1:
-        highscore_difficulty = "highscore_difficulty"
+        highscore_difficulty = "Medium"
     elif current_difficulty == 2:
         highscore_difficulty = "Hard"
-    highscores_difficulty_dropdown.set("Easy")
+    highscores_difficulty_dropdown.set(highscore_difficulty)
     update_highscores_listbox()
     
-
-    current_difficulty = difficulty
     moves_stack = []
     number_counts = {i: 0 for i in range(1, 10)}
+
+    previous_save = False
+    try:
+        # Check if the savegame file exists and is not empty
+        if os.path.exists("savegame.json") and os.path.getsize("savegame.json") > 0:
+            previous_save = True
+        else:
+            previous_save = False
+    except FileNotFoundError:
+        previous_save = False
     
-    if not reset:
+    if reset:
+        game_board = reset_board.copy()
+    elif previous_save:
+            loaded_game_board, loaded_solved_board, loaded_reset_board = load_game()
+            game_board = loaded_game_board
+            solved_board = loaded_solved_board
+            reset_board = loaded_reset_board
+            filename="savegame.json"
+            with open(filename, "w") as file:
+                pass
+    else:
         game_board, solved_board = board.generate_full_board(difficulty)
         reset_board = game_board.copy()
-    else:
-        game_board = reset_board.copy()
+        elapsed_time = 0
 
     for i in range(9):
         for j in range(9):
@@ -127,13 +148,13 @@ def new_board(difficulty, reset=False):
     if associated_button:
         number_button_clicked(current_number, associated_button)
 
-    elapsed_time = 0
     if not_paused == 0:
         pause_play()    
     
     count_numbers()
 
 def check():    
+    global game_board
     highscore_time = ""
     highscore_date = ""
     highscore_difficulty = ""
@@ -141,8 +162,6 @@ def check():
         for j in range(9):
             if cell_buttons[i][j].cget("text") == "":
                 return    
-            
-    game_board = [[0]*9 for _ in range(9)]
 
     for i in range(9):
         for j in range(9):
@@ -390,6 +409,41 @@ def update_highscores_listbox(*args):
             i += 1
             highscores_listbox.insert(END, score_string)
 
+def save_game():
+    filename="savegame.json"
+    current_board = []
+    for i in range(9):
+        current_board.append([int(cell_buttons[i][j].cget("text")) if cell_buttons[i][j].cget("text") != "" else 0 for j in range(9)])
+    save_data = {
+        "game_board": current_board,
+        "solved_board": solved_board,
+        "reset_board": reset_board,
+        "elapsed_time": elapsed_time,
+        "used_hint": used_hint,
+        "moves_stack": moves_stack
+    }
+    with open(filename, "w") as file:
+        json.dump(save_data, file)
+    print("Game saved successfully!")
+
+def load_game():
+    filename="savegame.json"
+    global elapsed_time, used_hint, moves_stack
+    try:
+        with open(filename, "r") as file:
+            save_data = json.load(file)
+        print("Game loaded successfully!")
+        
+        # Update global variables
+        elapsed_time = save_data.get("elapsed_time", 0)
+        used_hint = save_data.get("used_hint", False)
+        moves_stack = save_data.get("moves_stack", [])
+        
+        return save_data["game_board"], save_data["solved_board"], save_data["reset_board"]
+    except FileNotFoundError:
+        print("No saved game found.")
+        return None, None, None
+
 
 #################################################################################################
 # Main function to run the GUI
@@ -404,23 +458,33 @@ if __name__ == "__main__":
     main_frame = Frame(gui)
     main_frame.pack()
 
-    # # Highscores
-    highscores_frame = Frame(main_frame)
+    left_frame = Frame(main_frame)
+    left_frame.grid(row=0, column=0, padx=1, pady=1, sticky="n")
+
+    ## Highscores
+    highscores_frame = Frame(left_frame)
     highscores_frame.grid(row=0, column=0, padx=1, pady=10, sticky="n")
     highscores_label = Label(highscores_frame, text="Highscores", font=("Arial", 12))
-    highscores_label.grid(row=0, column=0, padx=1, pady=5)
+    highscores_label.grid(row=0, column=0, padx=1, pady=1)
     highscores_difficulty_dropdown = StringVar()
     highscores_difficulty_dropdown.set("Easy")
     highscores_difficulty_menu = OptionMenu(highscores_frame, highscores_difficulty_dropdown, "Easy", "Medium", "Hard")
     highscores_difficulty_menu.grid(row=1, column=0, padx=1, pady=5)
     highscores_difficulty_menu.config(width=20)
     highscores_listbox = Listbox(highscores_frame, width=25, height=10)
-    highscores_listbox.grid(row=2, column=0, padx=1, pady=5)
+    highscores_listbox.grid(row=2, column=0, padx=1, pady=1)
     
     highscores_loaded = load_highscores()
     update_highscores_listbox()
     highscores_difficulty_dropdown.trace("w", update_highscores_listbox)
 
+    ## Save functionality
+    save_frame = Frame(main_frame)
+    save_frame.grid(row=1, column=2, padx=1, pady=1)
+    save_description = Label(save_frame, text="Game will be loaded next\ntime Zudoku is launched", font=("Arial", 8))
+    save_description.grid(row=0, column=0, padx=1, pady=1, sticky="w")
+    save_button = Button(save_frame, text="SAVE", command=save_game)
+    save_button.grid(row=1, column=0, padx=1, pady=1, sticky="w")
     
 
     # Create a frame for the grid
@@ -524,17 +588,17 @@ if __name__ == "__main__":
 
     # Create frame for the action buttons
     action_frame = Frame(main_frame)
-    action_frame.grid(row=0, column=2, padx=20, pady=30)
+    action_frame.grid(row=0, column=2, padx=20, pady=10)
 
     # Create a subframe for the timer
     timer_frame = Frame(action_frame)
     timer_frame.grid(row=0, column=0, padx=0, pady=0, sticky="w")
 
     # Timer
-    timer_label = Label(timer_frame, text="Timer: ", font=("Arial", 8))
+    timer_label = Label(timer_frame, text="Timer: ", font=("Arial", 12))
     timer_label.grid(row=0, column=0, padx=0, pady=1, sticky="w")
 
-    elapsed_time_label = Label(timer_frame, text="", font=("Arial", 8))
+    elapsed_time_label = Label(timer_frame, text="", font=("Arial", 12))
     elapsed_time_label.grid(row=0, column=1, padx=5, pady=1)
 
     pause_button = Button(timer_frame, text="||", command=pause_play, font=("Arial", 8))
@@ -545,16 +609,16 @@ if __name__ == "__main__":
 
     # Action buttons
     game_options_label = Label(action_frame, text="Game Options:", font=("Arial", 8))
-    game_options_label.grid(row=1, column=0, pady=5, sticky="w")
+    game_options_label.grid(row=1, column=0, pady=4, sticky="w")
 
     new_game_button = Button(action_frame, text="New Game", command=lambda: new_board(difficulty_selected.get()), width=10, font=("Arial", 8))
-    new_game_button.grid(row=2, column=0, pady=5)
+    new_game_button.grid(row=2, column=0, pady=4)
 
     reset_board_button = Button(action_frame, text="Reset Board", command=lambda: new_board(difficulty_selected.get(), True), width=10, font=("Arial", 8))
-    reset_board_button.grid(row=3, column=0, pady=5)
+    reset_board_button.grid(row=3, column=0, pady=4)
 
     difficulty_label = Label(action_frame, text="Difficulty:", font=("Arial", 8))
-    difficulty_label.grid(row=4, column=0, pady=5, sticky="w")
+    difficulty_label.grid(row=4, column=0, pady=4, sticky="w")
 
     difficulty_selected = IntVar(value=0)  # This line remains untouched
     easy_radio = Radiobutton(action_frame, text="Easy (default)", variable=difficulty_selected, value=0, anchor="w", font=("Arial", 8))
@@ -567,7 +631,7 @@ if __name__ == "__main__":
     hard_radio.grid(row=7, column=0, sticky="w")
 
     note_answer_label = Label(action_frame, text="Current Entry Mode:", font=("Arial", 8))
-    note_answer_label.grid(row=8, column=0, pady=5, sticky="w")
+    note_answer_label.grid(row=8, column=0, pady=4, sticky="w")
 
     action_selected = IntVar(value=1)  # This line remains untouched
     answer_radio = Radiobutton(action_frame, text="Answer", command=lambda: note_answer_changed(answer_radio), variable=action_selected, value=1, anchor="w", font=("Arial", 8))
@@ -580,16 +644,16 @@ if __name__ == "__main__":
     erase_radio.grid(row=11, column=0, sticky="w")
 
     undo_botton = Button(action_frame, text="Undo", command=undo_move, width=10, font=("Arial", 8))
-    undo_botton.grid(row=12, column=0, pady=5, sticky="w")
+    undo_botton.grid(row=12, column=0, pady=4, sticky="w")
 
     validate_button = Button(action_frame, text="Validate", command=validate_current_board, width=10, font=("Arial", 8))
-    validate_button.grid(row=13, column=0, pady=5, sticky="w")
+    validate_button.grid(row=13, column=0, pady=4, sticky="w")
 
     hint_button = Button(action_frame, text="Hint", command=hint, width=10, font=("Arial", 8))
-    hint_button.grid(row=14, column=0, pady=5, sticky="w")
+    hint_button.grid(row=14, column=0, pady=4, sticky="w")
 
     show_solution_button = Button(action_frame, text="Show Solution", command=show_solution, width=10, font=("Arial", 8))
-    show_solution_button.grid(row=15, column=0, pady=5, sticky="w")
+    show_solution_button.grid(row=15, column=0, pady=4, sticky="w")
     # End action buttons
 
     # Test board solve function
