@@ -68,8 +68,6 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 - Consider if I can even actually implement a note system
 - Optional styling options ie nightmode
 - Save/load
-- Highscore system - Add a sort/filter by difficulty
-- Check/update highscore when a new board is loaded
 - Should erase alert the user if used on a blank cell?
 
 # Bugs
