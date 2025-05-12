@@ -62,6 +62,7 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 27. Implemented hint button
 28. Implemented a show solution button and updated the validation of a solved board to check if a hint, or show solution, was used
 29. Implemented a highscore system that persists locally. Shows top 10 in fastest time
+30. Highscores can now be filtered by difficulty and load preselected to the "Easy" filter. Highscores are also updated when a new game begins and will filter to the difficulty of the new game
 
 # To-do
 - Consider if I can even actually implement a note system

@@ -89,6 +89,21 @@ def new_board(difficulty, reset=False):
     global number_counts
     global moves_stack
     global current_difficulty
+    global highscores_loaded
+    global used_hint
+
+    used_hint = False
+
+    highscores_loaded = load_highscores()
+    if current_difficulty == 0:
+            highscore_difficulty = "Easy"
+    elif current_difficulty == 1:
+        highscore_difficulty = "highscore_difficulty"
+    elif current_difficulty == 2:
+        highscore_difficulty = "Hard"
+    highscores_difficulty_dropdown.set("Easy")
+    update_highscores_listbox()
+    
 
     current_difficulty = difficulty
     moves_stack = []
@@ -132,7 +147,7 @@ def check():
     for i in range(9):
         for j in range(9):
             game_board[i][j] = int(cell_buttons[i][j].cget("text"))
-    if board.board_is_valid(game_board): #and used_hint == False:
+    if board.board_is_valid(game_board) and used_hint == False:
         # Calculate minutes and seconds
         minutes = elapsed_time // 60
         seconds = elapsed_time % 60
@@ -329,8 +344,19 @@ def save_highscore(highscore_time, highscore_difficulty, highscore_date, filenam
     # Sort highscores by time (convert mm:ss to seconds for comparison)
     current_highscores.sort(key=lambda x: int(x[1].split(":")[0]) * 60 + int(x[1].split(":")[1]))
 
-    # Keep only the top 10 highscores
-    current_highscores = current_highscores[:10]
+    # Keep only the top 10 highscores per difficulty
+    difficulty_highscores = {}
+    for date, time, difficulty in current_highscores:
+        if difficulty not in difficulty_highscores:
+            difficulty_highscores[difficulty] = []
+        difficulty_highscores[difficulty].append((date, time))
+    for difficulty in difficulty_highscores:
+        difficulty_highscores[difficulty].sort(key=lambda x: int(x[1].split(":")[0]) * 60 + int(x[1].split(":")[1]))
+        difficulty_highscores[difficulty] = difficulty_highscores[difficulty][:10]
+    current_highscores = []
+    for difficulty in difficulty_highscores:
+        for date, time in difficulty_highscores[difficulty]:
+            current_highscores.append((date, time, difficulty))
 
     # Save the updated highscores back to the file
     with open(filename, "w") as f:
@@ -348,6 +374,21 @@ def load_highscores(filename="highscores.txt"):
         pass  # If the file doesn't exist, start with an empty list
 
     return highscores
+
+def update_highscores_listbox(*args):
+    # Get the selected difficulty
+    selected_difficulty = highscores_difficulty_dropdown.get()
+
+    # Clear the Listbox
+    highscores_listbox.delete(0, END)
+
+    # Filter and display highscores for the selected difficulty
+    i = 1
+    for date, time, difficulty in highscores_loaded:
+        if difficulty == selected_difficulty:
+            score_string = f"{i}) {date} - {time}"
+            i += 1
+            highscores_listbox.insert(END, score_string)
 
 
 #################################################################################################
@@ -368,15 +409,18 @@ if __name__ == "__main__":
     highscores_frame.grid(row=0, column=0, padx=1, pady=10, sticky="n")
     highscores_label = Label(highscores_frame, text="Highscores", font=("Arial", 12))
     highscores_label.grid(row=0, column=0, padx=1, pady=5)
+    highscores_difficulty_dropdown = StringVar()
+    highscores_difficulty_dropdown.set("Easy")
+    highscores_difficulty_menu = OptionMenu(highscores_frame, highscores_difficulty_dropdown, "Easy", "Medium", "Hard")
+    highscores_difficulty_menu.grid(row=1, column=0, padx=1, pady=5)
+    highscores_difficulty_menu.config(width=20)
     highscores_listbox = Listbox(highscores_frame, width=25, height=10)
-    highscores_listbox.grid(row=1, column=0, padx=1, pady=5)
+    highscores_listbox.grid(row=2, column=0, padx=1, pady=5)
     
     highscores_loaded = load_highscores()
-    print(highscores_listbox)
-    for date, time, difficulty in highscores_loaded:
-        score_string = f"{date} - {time} - {difficulty}"
-        print(score_string)
-        highscores_listbox.insert(END, score_string)
+    update_highscores_listbox()
+    highscores_difficulty_dropdown.trace("w", update_highscores_listbox)
+
     
 
     # Create a frame for the grid
