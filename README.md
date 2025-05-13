@@ -1,6 +1,8 @@
 # Zudoku
 An assisted Sudoku game made in Python using TKinter
 
+![Zudoku Screenshot](zudoku.png)
+
 # How to play
 ## Sudoku Rules
 
