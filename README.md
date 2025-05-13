@@ -67,13 +67,13 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 32. Fixed Bug: If a dupe is marked red and you change the selected number it changes back to light gray
 33. Erase shows a warning popup if you try to use it on an already empty cell
 34. Highscores and difficulty radio button are updated to the current difficulty of a loaded save game when game starts
+35. Fixed Bug: Can continue playing the game if paused - should resume timer if cell is clicked
 
-# To-do
+# Future Considerations
 - Consider if I can even actually implement a note system
 - Optional styling options ie nightmode
 
 # Bugs
-- Bug: Can continue playing the game if paused - should resume timer if cell is clicked
 - Bug: Click valid cell, click another cell in the same box that would be valid if the first click wasn't made. Erase first click. Second click still shows red (Ignoring this defect for now because it's not a common workflow and the work around is to simply erase the number and enter it again)
 
 

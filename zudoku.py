@@ -52,6 +52,8 @@ def cell_button_clicked(button):
         moves_stack.append(move_made)
         # Check if the board is complete, update numbers used, check for dupes
         check()
+        if not_paused == 0:
+            pause_play()
         count_numbers()
         check_dupes(button)
     elif action_type == 2:
@@ -60,27 +62,7 @@ def cell_button_clicked(button):
             return
         button.config(text="")
         button.config(bg="lightgray")  # Reset to default background color
-        count_numbers()
-
-        # The following code is commented out because it appears to be a bug
-        # # Get the global row and column of the erased cell
-        # global_row, global_col = button_subgrid(button)
-
-        # # Revalidate the row
-        # for col in range(9):
-        #     check_dupes(cell_buttons[global_row][col])
-
-        # # Revalidate the column
-        # for row in range(9):
-        #     check_dupes(cell_buttons[row][global_col])
-
-        # # Revalidate the subgrid
-        # subgrid_row_start = global_row - (global_row % 3)
-        # subgrid_col_start = global_col - (global_col % 3)
-        # for i in range(3):
-        #     for j in range(3):
-        #         check_dupes(cell_buttons[subgrid_row_start + i][subgrid_col_start + j])
-        
+        count_numbers()     
     else:
         print("Invalid action")
 
