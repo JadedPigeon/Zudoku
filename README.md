@@ -64,17 +64,18 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 29. Implemented a highscore system that persists locally. Shows top 10 in fastest time
 30. Highscores can now be filtered by difficulty and load preselected to the "Easy" filter. Highscores are also updated when a new game begins and will filter to the difficulty of the new game
 31. Implemented a save system which retains the current board, time elapsed, undo list, the original board to reset to, the solution board
+32. Fixed Bug: If a dupe is marked red and you change the selected number it changes back to light gray
+33. Erase shows a warning popup if you try to use it on an already empty cell
 
 # To-do
 - Consider if I can even actually implement a note system
 - Optional styling options ie nightmode
-- Should erase alert the user if used on a blank cell?
 - Difficulty is set to easy for the radio button and highscore even if loaded game was a higher difficulty - needs to be updated and show current difficulty
 
 # Bugs
 - Bug: Can continue playing the game if paused - should resume timer if cell is clicked
 - Bug: Click valid cell, click another cell in the same box that would be valid if the first click wasn't made. Erase first click. Second click still shows red (Ignoring this defect for now because it's not a common workflow and the work around is to simply erase the number and enter it again)
-- Bug: If a dupe is marked red and you change the selected number it changes back to light gray
+
 
 
 

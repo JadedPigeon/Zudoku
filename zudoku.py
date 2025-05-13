@@ -55,6 +55,9 @@ def cell_button_clicked(button):
         count_numbers()
         check_dupes(button)
     elif action_type == 2:
+        if button.cget("text") == "":
+            messagebox.showerror("No number to erase", "There is no number to erase in this cell.")
+            return
         button.config(text="")
         button.config(bg="lightgray")  # Reset to default background color
         count_numbers()
