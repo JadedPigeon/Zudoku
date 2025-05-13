@@ -425,7 +425,8 @@ def save_game():
         "reset_board": reset_board,
         "elapsed_time": elapsed_time,
         "used_hint": used_hint,
-        "moves_stack": moves_stack
+        "moves_stack": moves_stack,
+        "current_difficulty": current_difficulty
     }
     with open(filename, "w") as file:
         json.dump(save_data, file)
@@ -433,7 +434,7 @@ def save_game():
 
 def load_game():
     filename="savegame.json"
-    global elapsed_time, used_hint, moves_stack
+    global elapsed_time, used_hint, moves_stack, current_difficulty
     try:
         with open(filename, "r") as file:
             save_data = json.load(file)
@@ -443,6 +444,16 @@ def load_game():
         elapsed_time = save_data.get("elapsed_time", 0)
         used_hint = save_data.get("used_hint", False)
         moves_stack = save_data.get("moves_stack", [])
+        current_difficulty = save_data.get("current_difficulty", 0)
+
+        # Update difficulty
+        difficulty_selected.set(current_difficulty)
+        if current_difficulty == 0:
+            highscores_difficulty_dropdown.set("Easy")
+        elif current_difficulty == 1:
+            highscores_difficulty_dropdown.set("Medium")
+        elif current_difficulty == 2:
+            highscores_difficulty_dropdown.set("Hard")
         
         return save_data["game_board"], save_data["solved_board"], save_data["reset_board"]
     except FileNotFoundError:

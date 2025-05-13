@@ -66,11 +66,11 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 31. Implemented a save system which retains the current board, time elapsed, undo list, the original board to reset to, the solution board
 32. Fixed Bug: If a dupe is marked red and you change the selected number it changes back to light gray
 33. Erase shows a warning popup if you try to use it on an already empty cell
+34. Highscores and difficulty radio button are updated to the current difficulty of a loaded save game when game starts
 
 # To-do
 - Consider if I can even actually implement a note system
 - Optional styling options ie nightmode
-- Difficulty is set to easy for the radio button and highscore even if loaded game was a higher difficulty - needs to be updated and show current difficulty
 
 # Bugs
 - Bug: Can continue playing the game if paused - should resume timer if cell is clicked
