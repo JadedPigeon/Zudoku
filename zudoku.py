@@ -442,6 +442,55 @@ def load_game():
         print("No saved game found.")
         return None, None, None
 
+def show_about():
+    about_text = """
+# Zudoku
+An assisted Sudoku game made in Python using TKinter
+
+# How to play
+## Sudoku Rules
+
+Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, divided into nine 3x3 subgrids (also called "regions" or "blocks"). The objective is to fill the grid with numbers from 1 to 9 according to the following rules:
+
+1. **Unique Numbers in Rows:** Each row must contain the numbers 1 to 9, without repetition.
+
+2. **Unique Numbers in Columns:** Each column must also contain the numbers 1 to 9, without repetition.
+
+3. **Unique Numbers in Subgrids:** Each 3x3 subgrid must contain the numbers 1 to 9, without repetition.
+
+4. **Given Numbers:** Some cells are pre-filled as clues. These numbers cannot be changed.
+
+5. **One Solution:** A properly constructed Sudoku puzzle has only one possible solution.
+
+### Tips
+- Start with rows, columns, or subgrids that have the most given numbers.
+- Use the process of elimination to figure out which numbers fit.
+- If stuck, look for numbers that must be in a specific place within a row, column, or subgrid.
+
+## How Zudoku assists you
+1. Click a number 1 to 9 from the buttons on the bottom of the screen
+2. Existing numbers on the Zudoku board will be highlighted for visibility
+3. Click a cell to insert the selected number (make sure "Current Entry Mode" is set to "Answer" which is the default)
+4. If the number you insert already exists in that block, row, or column, it will be highlighted red
+5. When all cells have been filled the game checks if the solution is valid and informs you
+6. Select a difficulty and start a new game
+7. Zudoku offers tools to validate your current game, save your game, provide a hint revealing a random cell, or showing the board's solution
+    """
+    # Create a new Toplevel window
+    about_window = Toplevel(gui)
+    about_window.title("About Zudoku")
+    about_window.geometry("600x400")  # Set the size of the window
+
+    # Add a scrollable Text widget
+    text_widget = Text(about_window, wrap="word", font=("Arial", 10))
+    text_widget.insert("1.0", about_text)
+    text_widget.config(state="disabled")  # Make the text read-only
+    text_widget.pack(expand=True, fill="both", padx=10, pady=10)
+
+    # Add a scrollbar
+    scrollbar = Scrollbar(text_widget, command=text_widget.yview)
+    text_widget.config(yscrollcommand=scrollbar.set)
+    scrollbar.pack(side="right", fill="y")
 
 #################################################################################################
 # Main function to run the GUI
@@ -483,6 +532,10 @@ if __name__ == "__main__":
     save_description.grid(row=0, column=0, padx=1, pady=1, sticky="w")
     save_button = Button(save_frame, text="SAVE", command=save_game)
     save_button.grid(row=1, column=0, padx=1, pady=1, sticky="w")
+
+    ## About
+    about_button = Button(save_frame, text="About", command=show_about)
+    about_button.grid(row=1, column=0, padx=1, pady=1, sticky="e")
     
 
     # Create a frame for the grid

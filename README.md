@@ -28,11 +28,20 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 4. If the number you insert already exists in that block, row, or column, it will be highlighted red
 5. When all cells have been filled the game checks if the solution is valid and informs you
 6. Select a difficulty and start a new game
+7. Zudoku offers tools to validate your current game, save your game, provide a hint revealing a random cell, or showing the board's solution
  
+# How to run the game
+## Linux/MacOS (Reccomended for styling purposes):
+```
+python3 -m zudoku
+```
+
+## Windows
+```
+python zudoku.py
+```
 
 # Dev log
-
-# Completed
 1. Created the Sudoku Board
 2. Created number buttons
 3. Created mode and related buttons
@@ -68,10 +77,11 @@ Sudoku is a logic-based number puzzle that is typically played on a 9x9 grid, di
 33. Erase shows a warning popup if you try to use it on an already empty cell
 34. Highscores and difficulty radio button are updated to the current difficulty of a loaded save game when game starts
 35. Fixed Bug: Can continue playing the game if paused - should resume timer if cell is clicked
+36. Added an About button for context and instructions
 
 # Future Considerations
 - Consider if I can even actually implement a note system
-- Optional styling options ie nightmode
+- Optional styling options ie nightmode and make the game look better on windows
 
 # Bugs
 - Bug: Click valid cell, click another cell in the same box that would be valid if the first click wasn't made. Erase first click. Second click still shows red (Ignoring this defect for now because it's not a common workflow and the work around is to simply erase the number and enter it again)
