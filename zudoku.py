@@ -31,7 +31,9 @@ def number_button_clicked(number, button):
 
     for i in range(9):
         for j in range(9):
-            if cell_buttons[i][j].cget("text") == str(current_number):
+            if cell_buttons[i][j].cget("bg") == "red":
+                pass
+            elif cell_buttons[i][j].cget("text") == str(current_number):
                 cell_buttons[i][j].config(bg="dark gray")
             else:
                 cell_buttons[i][j].config(bg="lightgray")

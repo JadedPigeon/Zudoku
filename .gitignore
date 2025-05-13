@@ -175,4 +175,5 @@ cython_debug/
 
 # App specific files
 highscores.txt
+highscores_test.txt
 savegame.json
